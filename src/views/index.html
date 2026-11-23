@@ -4,11 +4,84 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TechOS — Gestão de Ordens de Serviço</title>
+  <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body>
-  <main>
-    <h1>Sistema TechOS</h1>
-    <p>Interface em desenvolvimento (Bloco 3).</p>
+  <header class="topo">
+    <div class="container topo-conteudo">
+      <h1 class="marca">TechOS</h1>
+      <nav aria-label="Navegação principal" class="menu-navegacao">
+        <a href="#painel" class="link-nav">Painel &amp; Relatório</a>
+        <a href="#clientes" class="link-nav">Clientes</a>
+        <a href="#equipamentos" class="link-nav">Equipamentos</a>
+        <a href="#ordens" class="link-nav">Ordens de Serviço</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container principal">
+    <section id="painel" aria-labelledby="titulo-painel" class="secao">
+      <h2 id="titulo-painel">Painel e Resumo de Ordens de Serviço</h2>
+      <div class="grid-resumo">
+        <article class="cartao">
+          <h3>Abertas</h3>
+          <p class="valor-kpi" id="kpi-abertas">0</p>
+        </article>
+        <article class="cartao">
+          <h3>Em Andamento</h3>
+          <p class="valor-kpi" id="kpi-andamento">0</p>
+        </article>
+        <article class="cartao">
+          <h3>Concluídas</h3>
+          <p class="valor-kpi" id="kpi-concluidas">0</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="clientes" aria-labelledby="titulo-clientes" class="secao">
+      <h2 id="titulo-clientes">Cadastro de Clientes</h2>
+      <form id="form-cliente" class="formulario">
+        <div class="campo">
+          <label for="cliente-nome">Nome completo</label>
+          <input id="cliente-nome" name="nome" type="text" required />
+        </div>
+        <div class="campo">
+          <label for="cliente-telefone">Telefone</label>
+          <input id="cliente-telefone" name="telefone" type="tel" required />
+        </div>
+        <button type="submit" class="btn-primario">Salvar Cliente</button>
+      </form>
+    </section>
+
+    <section id="equipamentos" aria-labelledby="titulo-equipamentos" class="secao">
+      <h2 id="titulo-equipamentos">Cadastro de Equipamentos</h2>
+      <form id="form-equipamento" class="formulario">
+        <div class="campo">
+          <label for="equipamento-modelo">Modelo</label>
+          <input id="equipamento-modelo" name="modelo" type="text" required />
+        </div>
+        <div class="campo">
+          <label for="equipamento-serie">Número de série</label>
+          <input id="equipamento-serie" name="numeroSerie" type="text" required />
+        </div>
+        <button type="submit" class="btn-primario">Salvar Equipamento</button>
+      </form>
+    </section>
+
+    <section id="ordens" aria-labelledby="titulo-ordens" class="secao">
+      <h2 id="titulo-ordens">Ordens de Serviço</h2>
+      <form id="form-os" class="formulario">
+        <div class="campo">
+          <label for="os-defeito">Descrição do defeito</label>
+          <input id="os-defeito" name="descricaoDefeito" type="text" required />
+        </div>
+        <div class="campo">
+          <label for="os-valor">Valor do serviço (R$)</label>
+          <input id="os-valor" name="valorServico" type="number" step="0.01" min="0" value="0.00" />
+        </div>
+        <button type="submit" class="btn-primario">Abrir Ordem de Serviço</button>
+      </form>
+    </section>
   </main>
 </body>
 </html>
