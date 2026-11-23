@@ -2,10 +2,12 @@ require('dotenv').config();
 const path = require('path');
 const express = require('express');
 const cors = require('cors');
+const AuthController = require('./controllers/AuthController');
 const osRoutes = require('./routes/osRoutes');
 
 const app = express();
 const port = Number(process.env.APP_PORT) || 3000;
+const authController = new AuthController();
 
 app.use(cors());
 app.use(express.json());
@@ -15,6 +17,7 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 
+app.post('/api/auth/login', (req, res) => authController.login(req, res));
 app.use('/api/os', osRoutes);
 
 app.use((req, res) => {
