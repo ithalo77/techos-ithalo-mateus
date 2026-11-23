@@ -1,0 +1,18 @@
+export function aplicarMascaraTelefone(valor) {
+  const digitos = valor.replace(/\D/g, '').slice(0, 11);
+
+  if (digitos.length <= 2) {
+    return digitos.length ? `(${digitos}` : '';
+  }
+  if (digitos.length <= 6) {
+    return `(${digitos.slice(0, 2)}) ${digitos.slice(2)}`;
+  }
+  if (digitos.length <= 10) {
+    return `(${digitos.slice(0, 2)}) ${digitos.slice(2, 6)}-${digitos.slice(6)}`;
+  }
+  return `(${digitos.slice(0, 2)}) ${digitos.slice(2, 7)}-${digitos.slice(7)}`;
+}
+
+export function validarTextoObrigatorio(valor) {
+  return typeof valor === 'string' && valor.trim().length >= 2;
+}

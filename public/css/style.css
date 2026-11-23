@@ -173,3 +173,26 @@ body {
     align-items: end;
   }
 }
+
+.oculto {
+  display: none;
+}
+
+.alerta {
+  padding: 14px 18px;
+  border-radius: 6px;
+  font-weight: bold;
+  border: 1px solid transparent;
+}
+
+.alerta--sucesso {
+  background-color: #dcfce7;
+  color: #14532d;
+  border-color: #16a34a;
+}
+
+.alerta--erro {
+  background-color: #fee2e2;
+  color: #7f1d1d;
+  border-color: #dc2626;
+}
