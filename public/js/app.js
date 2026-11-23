@@ -4,6 +4,65 @@ import { criarAlerta } from './alerta.js';
 const elementoAlerta = document.getElementById('alerta-feedback');
 const alerta = criarAlerta(elementoAlerta);
 
+const kpiAbertas = document.getElementById('kpi-abertas');
+const kpiAndamento = document.getElementById('kpi-andamento');
+const kpiConcluidas = document.getElementById('kpi-concluidas');
+const listaOs = document.getElementById('lista-os');
+const filtroStatus = document.getElementById('filtro-status');
+
+function atualizarKpis(ordens) {
+  if (!kpiAbertas || !kpiAndamento || !kpiConcluidas) return;
+
+  kpiAbertas.textContent = String(ordens.filter((os) => os.status === 'ABERTA').length);
+  kpiAndamento.textContent = String(ordens.filter((os) => os.status === 'EM_ANDAMENTO').length);
+  kpiConcluidas.textContent = String(ordens.filter((os) => os.status === 'CONCLUIDA').length);
+}
+
+function renderizarOrdens(ordens) {
+  if (!listaOs) return;
+
+  listaOs.innerHTML = '';
+  if (!ordens.length) {
+    const vazio = document.createElement('li');
+    vazio.className = 'item-os';
+    vazio.textContent = 'Nenhuma ordem de serviço encontrada.';
+    listaOs.appendChild(vazio);
+    return;
+  }
+
+  for (const os of ordens) {
+    const item = document.createElement('li');
+    item.className = 'item-os';
+    item.textContent = `#${os.id} — ${os.descricaoDefeito} | Status: ${os.status} | Valor: R$ ${Number(os.valorServico || 0).toFixed(2)}`;
+    listaOs.appendChild(item);
+  }
+}
+
+async function carregarOrdens() {
+  try {
+    const statusSelecionado = filtroStatus ? filtroStatus.value : 'TODAS';
+    const url = statusSelecionado && statusSelecionado !== 'TODAS'
+      ? `/api/os?status=${encodeURIComponent(statusSelecionado)}`
+      : '/api/os';
+
+    const resposta = await fetch(url);
+    const dados = await resposta.json();
+
+    if (!resposta.ok) {
+      throw new Error(dados.mensagem || 'Falha ao consultar ordens de serviço.');
+    }
+
+    const lista = Array.isArray(dados.dados) ? dados.dados : [];
+    renderizarOrdens(lista);
+
+    if (!statusSelecionado || statusSelecionado === 'TODAS') {
+      atualizarKpis(lista);
+    }
+  } catch (erro) {
+    alerta.mostrar(erro.message || 'Erro de comunicação com o servidor.', 'erro');
+  }
+}
+
 const inputTelefone = document.getElementById('cliente-telefone');
 if (inputTelefone) {
   inputTelefone.addEventListener('input', (evento) => {
@@ -45,21 +104,48 @@ if (formEquipamento) {
   });
 }
 
-const kpiAbertas = document.getElementById('kpi-abertas');
 const formOs = document.getElementById('form-os');
-if (formOs && kpiAbertas) {
-  formOs.addEventListener('submit', (evento) => {
+if (formOs) {
+  formOs.addEventListener('submit', async (evento) => {
     evento.preventDefault();
-    const defeito = formOs.descricaoDefeito.value;
+    const descricaoDefeito = formOs.descricaoDefeito.value;
+    const valorServico = Number(formOs.valorServico.value || 0);
 
-    if (!validarTextoObrigatorio(defeito)) {
+    if (!validarTextoObrigatorio(descricaoDefeito)) {
       alerta.mostrar('Descreva o defeito antes de abrir a Ordem de Serviço.', 'erro');
       return;
     }
 
-    const totalAtual = Number(kpiAbertas.textContent) || 0;
-    kpiAbertas.textContent = String(totalAtual + 1);
-    alerta.mostrar('Ordem de serviço registada com status ABERTA.', 'sucesso');
-    formOs.reset();
+    try {
+      const resposta = await fetch('/api/os', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clienteId: 1,
+          equipamentoId: 1,
+          descricaoDefeito: descricaoDefeito.trim(),
+          valorServico
+        })
+      });
+
+      const resultado = await resposta.json();
+      if (!resposta.ok) {
+        throw new Error(resultado.mensagem || 'Não foi possível abrir a Ordem de Serviço.');
+      }
+
+      alerta.mostrar('Ordem de serviço registada com status ABERTA.', 'sucesso');
+      formOs.reset();
+      await carregarOrdens();
+    } catch (erro) {
+      alerta.mostrar(erro.message || 'Erro ao enviar Ordem de Serviço.', 'erro');
+    }
   });
 }
+
+if (filtroStatus) {
+  filtroStatus.addEventListener('change', () => {
+    carregarOrdens();
+  });
+}
+
+carregarOrdens();

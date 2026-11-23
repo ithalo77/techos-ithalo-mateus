@@ -196,3 +196,32 @@ body {
   color: #7f1d1d;
   border-color: #dc2626;
 }
+
+.campo select {
+  padding: 10px 12px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 4px;
+  font-size: 1rem;
+  color: var(--cor-texto);
+  background-color: var(--cor-superficie);
+}
+
+.lista-os {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.item-os {
+  padding: 12px 14px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 6px;
+  background-color: #f8fafc;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+}
