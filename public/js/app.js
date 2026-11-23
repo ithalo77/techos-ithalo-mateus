@@ -9,6 +9,23 @@ const kpiAndamento = document.getElementById('kpi-andamento');
 const kpiConcluidas = document.getElementById('kpi-concluidas');
 const listaOs = document.getElementById('lista-os');
 const filtroStatus = document.getElementById('filtro-status');
+const estadoSessao = document.getElementById('estado-sessao');
+
+function obterToken() {
+  return sessionStorage.getItem('techos_token') || '';
+}
+
+function atualizarEstadoSessao() {
+  if (!estadoSessao) return;
+  const nomeUsuario = sessionStorage.getItem('techos_usuario');
+  const token = obterToken();
+
+  if (token && nomeUsuario) {
+    estadoSessao.textContent = `Sessão ativa: ${nomeUsuario} (JWT configurado)`;
+  } else {
+    estadoSessao.textContent = 'Sessão: não autenticado';
+  }
+}
 
 function atualizarKpis(ordens) {
   if (!kpiAbertas || !kpiAndamento || !kpiConcluidas) return;
@@ -61,6 +78,40 @@ async function carregarOrdens() {
   } catch (erro) {
     alerta.mostrar(erro.message || 'Erro de comunicação com o servidor.', 'erro');
   }
+}
+
+const formLogin = document.getElementById('form-login');
+if (formLogin) {
+  formLogin.addEventListener('submit', async (evento) => {
+    evento.preventDefault();
+    const email = formLogin.email.value.trim();
+    const senha = formLogin.senha.value;
+
+    if (!email || !senha) {
+      alerta.mostrar('Informe e-mail e senha para autenticar.', 'erro');
+      return;
+    }
+
+    try {
+      const resposta = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, senha })
+      });
+
+      const resultado = await resposta.json();
+      if (!resposta.ok || !resultado.dados?.token) {
+        throw new Error(resultado.mensagem || 'Falha na autenticação.');
+      }
+
+      sessionStorage.setItem('techos_token', resultado.dados.token);
+      sessionStorage.setItem('techos_usuario', resultado.dados.usuario?.nome || email);
+      atualizarEstadoSessao();
+      alerta.mostrar('Login realizado com sucesso.', 'sucesso');
+    } catch (erro) {
+      alerta.mostrar(erro.message || 'Erro ao autenticar.', 'erro');
+    }
+  });
 }
 
 const inputTelefone = document.getElementById('cliente-telefone');
@@ -116,10 +167,19 @@ if (formOs) {
       return;
     }
 
+    const token = obterToken();
+    if (!token) {
+      alerta.mostrar('Faça login primeiro para obter o token JWT.', 'erro');
+      return;
+    }
+
     try {
       const resposta = await fetch('/api/os', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
         body: JSON.stringify({
           clienteId: 1,
           equipamentoId: 1,
@@ -148,4 +208,5 @@ if (filtroStatus) {
   });
 }
 
+atualizarEstadoSessao();
 carregarOrdens();

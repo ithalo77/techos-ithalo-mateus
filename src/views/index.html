@@ -113,6 +113,22 @@
       <ul id="lista-os" class="lista-os"></ul>
     </section>
 
+    <section id="autenticacao" aria-labelledby="titulo-auth" class="secao">
+      <h2 id="titulo-auth">Acesso do Operador (JWT)</h2>
+      <form id="form-login" class="formulario" novalidate>
+        <div class="campo">
+          <label for="login-email">E-mail</label>
+          <input id="login-email" name="email" type="email" value="tecnico@techos.com" required />
+        </div>
+        <div class="campo">
+          <label for="login-senha">Senha</label>
+          <input id="login-senha" name="senha" type="password" value="TechOS@123" required />
+        </div>
+        <button type="submit" class="btn-primario">Entrar</button>
+      </form>
+      <p id="estado-sessao" class="estado-sessao">Sessão: não autenticado</p>
+    </section>
+
   <script type="module" src="/js/app.js"></script>
 </body>
 </html>
