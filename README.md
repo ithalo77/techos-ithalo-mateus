@@ -13,3 +13,8 @@ O sistema **TechOS** segue uma arquitetura cliente-servidor em 3 camadas desacop
 3. **Banco de Dados:** MySQL Server (porta `3306` via XAMPP / MySQL Workbench) para persistência relacional dos dados.
 
 ![Arquitetura do Sistema TechOS](docs/arquitetura-techos.png)
+
+## Configuração de Ambiente
+
+1. Copie o ficheiro `.env.example` para `.env` na raiz do projeto.
+2. Preencha as credenciais do MySQL (XAMPP) e defina uma chave forte em `JWT_SECRET`.
