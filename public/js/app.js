@@ -123,7 +123,7 @@ if (inputTelefone) {
 
 const formCliente = document.getElementById('form-cliente');
 if (formCliente) {
-  formCliente.addEventListener('submit', (evento) => {
+  formCliente.addEventListener('submit', async (evento) => {
     evento.preventDefault();
     const nome = formCliente.nome.value;
     const telefone = formCliente.telefone.value;
@@ -133,14 +133,38 @@ if (formCliente) {
       return;
     }
 
-    alerta.mostrar(`Cliente "${nome.trim()}" validado com sucesso.`, 'sucesso');
-    formCliente.reset();
+    const token = obterToken();
+    if (!token) {
+      alerta.mostrar('Faça login primeiro para cadastrar clientes.', 'erro');
+      return;
+    }
+
+    try {
+      const resposta = await fetch('/api/clientes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ nome: nome.trim(), telefone: telefone.trim() })
+      });
+
+      const resultado = await resposta.json();
+      if (!resposta.ok) {
+        throw new Error(resultado.mensagem || 'Não foi possível salvar o cliente.');
+      }
+
+      alerta.mostrar(`Cliente "${resultado.dados.nome}" salvo no banco.`, 'sucesso');
+      formCliente.reset();
+    } catch (erro) {
+      alerta.mostrar(erro.message || 'Erro ao salvar cliente.', 'erro');
+    }
   });
 }
 
 const formEquipamento = document.getElementById('form-equipamento');
 if (formEquipamento) {
-  formEquipamento.addEventListener('submit', (evento) => {
+  formEquipamento.addEventListener('submit', async (evento) => {
     evento.preventDefault();
     const modelo = formEquipamento.modelo.value;
     const numeroSerie = formEquipamento.numeroSerie.value;
@@ -150,8 +174,36 @@ if (formEquipamento) {
       return;
     }
 
-    alerta.mostrar(`Equipamento "${modelo.trim()}" pronto para vínculo.`, 'sucesso');
-    formEquipamento.reset();
+    const token = obterToken();
+    if (!token) {
+      alerta.mostrar('Faça login primeiro para cadastrar equipamentos.', 'erro');
+      return;
+    }
+
+    try {
+      const resposta = await fetch('/api/equipamentos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          clienteId: 1,
+          modelo: modelo.trim(),
+          numeroSerie: numeroSerie.trim()
+        })
+      });
+
+      const resultado = await resposta.json();
+      if (!resposta.ok) {
+        throw new Error(resultado.mensagem || 'Não foi possível salvar o equipamento.');
+      }
+
+      alerta.mostrar(`Equipamento "${resultado.dados.modelo}" salvo no banco.`, 'sucesso');
+      formEquipamento.reset();
+    } catch (erro) {
+      alerta.mostrar(erro.message || 'Erro ao salvar equipamento.', 'erro');
+    }
   });
 }
 
