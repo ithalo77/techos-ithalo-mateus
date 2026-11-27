@@ -20,6 +20,10 @@ app.get('/', (req, res) => {
 app.post('/api/auth/login', (req, res) => authController.login(req, res));
 app.use('/api/os', osRoutes);
 
+const cadastrosRoutes = require('./routes/cadastrosRoutes');
+// ...
+app.use('/api', cadastrosRoutes);
+
 app.use((req, res) => {
   return res.status(404).json({
     sucesso: false,
