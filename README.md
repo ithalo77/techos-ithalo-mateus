@@ -8,13 +8,18 @@
 
 O sistema **TechOS** segue uma arquitetura cliente-servidor em 3 camadas desacopladas:
 
-1. **Frontend (Web):** Interface em HTML5, CSS3 e JavaScript que envia requisições HTTP assíncronas com payloads JSON (`GET`, `POST`, `PUT`, `DELETE`).
-2. **Backend (API):** Servidor de aplicação (Node.js ou PHP/XAMPP) responsável por validar regras de negócio e comunicar-se via SQL/TCP.
-3. **Banco de Dados:** MySQL Server (porta `3306` via XAMPP / MySQL Workbench) para persistência relacional dos dados.
+1. **Frontend (Web):** Interface responsiva em HTML5, CSS3 e JavaScript modular (`375px` a `1920px`, WCAG 2.1) com consumo assíncrono via `fetch` e `async/await`.
+2. **Backend (API):** Servidor Node.js com Express, autenticação via `bcryptjs` e `JWT`, validação de payloads e persistência relacional com `mysql2`.
+3. **Banco de Dados:** MySQL Server (porta `3306` via XAMPP / MySQL Workbench) modelado em `database/schema.sql`.
 
 ![Arquitetura do Sistema TechOS](docs/arquitetura-techos.png)
 
-## Configuração de Ambiente
+## Configuração e Execução
 
-1. Copie o ficheiro `.env.example` para `.env` na raiz do projeto.
-2. Preencha as credenciais do MySQL (XAMPP) e defina uma chave forte em `JWT_SECRET`.
+1. Copie `.env.example` para `.env` na raiz e ajuste as variáveis do MySQL e `JWT_SECRET`.
+2. Execute o script `database/schema.sql` no MySQL (`techos_db`).
+3. Instale as dependências com `npm install`.
+4. Rode os testes automatizados com `npm test`.
+5. Inicie o servidor com `npm start` e abra `http://localhost:3000`.
+
+Para mais detalhes, consulte `docs/DEPLOY_E_OPERACAO.md`.
