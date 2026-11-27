@@ -1,0 +1,66 @@
+CREATE DATABASE IF NOT EXISTS techos_db
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
+
+USE techos_db;
+
+CREATE TABLE IF NOT EXISTS usuarios (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nome VARCHAR(120) NOT NULL,
+  email VARCHAR(150) NOT NULL UNIQUE,
+  senha_hash VARCHAR(255) NOT NULL,
+  perfil ENUM('TECNICO', 'ATENDENTE') NOT NULL DEFAULT 'TECNICO',
+  especialidade_ou_setor VARCHAR(120) NULL,
+  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS clientes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nome VARCHAR(120) NOT NULL,
+  telefone VARCHAR(20) NOT NULL,
+  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS equipamentos (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  cliente_id INT NOT NULL,
+  modelo VARCHAR(120) NOT NULL,
+  numero_serie VARCHAR(100) NOT NULL UNIQUE,
+  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_equipamentos_cliente
+    FOREIGN KEY (cliente_id) REFERENCES clientes(id)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS ordens_servico (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  cliente_id INT NOT NULL,
+  equipamento_id INT NOT NULL,
+  usuario_id INT NULL,
+  descricao_defeito TEXT NOT NULL,
+  valor_servico DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
+  status ENUM('ABERTA', 'EM_ANDAMENTO', 'CONCLUIDA') NOT NULL DEFAULT 'ABERTA',
+  data_abertura TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_os_cliente
+    FOREIGN KEY (cliente_id) REFERENCES clientes(id)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
+  CONSTRAINT fk_os_equipamento
+    FOREIGN KEY (equipamento_id) REFERENCES equipamentos(id)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
+  CONSTRAINT fk_os_usuario
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE
+);
+
+INSERT INTO clientes (nome, telefone)
+SELECT * FROM (SELECT 'Cliente Padrão TechOS', '(81) 99999-0000') AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM clientes WHERE id = 1);
+
+INSERT INTO equipamentos (cliente_id, modelo, numero_serie)
+SELECT * FROM (SELECT 1, 'Equipamento Padrão', 'SN-TECHOS-001') AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM equipamentos WHERE numero_serie = 'SN-TECHOS-001');
